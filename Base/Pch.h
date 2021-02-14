@@ -36,9 +36,9 @@ namespace Beginner
 	DirectX::XMFLOAT3 FigureVertex(const DirectX::XMFLOAT3&, const Size);
 
 	//バッファの作成
-	bool CreateBuffer(const HWND, Microsoft::WRL::ComPtr<ID3D12Resource>&, const size_t);
-	bool CreateBuffer(const HWND, Microsoft::WRL::ComPtr<ID3D12Resource>&, const DirectX::TexMetadata&);
-	bool CreateDepthBuffer(const HWND, Microsoft::WRL::ComPtr<ID3D12Resource>&);
+	bool CreateBuffer(Microsoft::WRL::ComPtr<ID3D12Resource>&, const size_t);
+	bool CreateBuffer(Microsoft::WRL::ComPtr<ID3D12Resource>&, const DirectX::TexMetadata&);
+	bool CreateDepthBuffer(Microsoft::WRL::ComPtr<ID3D12Resource>&);
 
 	//バッファにマップ
 	VertexUV* BufferMap(Microsoft::WRL::ComPtr<ID3D12Resource>&, std::vector<VertexUV>::iterator, std::vector<VertexUV>::iterator, const bool);
@@ -51,7 +51,7 @@ namespace Beginner
 	D3D12_PRIMITIVE_TOPOLOGY GetPrimitiveTopology(const unsigned short);//頂点数からポリゴン図形を取得
 	D3D12_PRIMITIVE_TOPOLOGY_TYPE GetPrimitiveTopologyType(const D3D12_PRIMITIVE_TOPOLOGY);//グラフィックパイプライン用のプリミティブを取得
 
-	Size GetWindowSize(const HWND);	//ウィンドウサイズを取得
+	Size GetWindowSize();	//ウィンドウサイズを取得
 
 	//XMFLOAT3とVector3間の変換
 	Vector3 TransformToVector3(const DirectX::XMFLOAT3&);
@@ -63,8 +63,8 @@ namespace Beginner
 
 	void OutPutRootSignatureError(Microsoft::WRL::ComPtr<ID3DBlob>&);//ルートシグネチャのエラー表示
 
-	//ビューの作製
-	void CreateConstantView(const HWND, Microsoft::WRL::ComPtr<ID3D12Resource>&, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>&);
-	void CreateShaderResourceView(const HWND, Microsoft::WRL::ComPtr<ID3D12Resource>&, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>&, const DXGI_FORMAT);
-	void CreateDepthView(const HWND, Microsoft::WRL::ComPtr<ID3D12Resource>&, const D3D12_CPU_DESCRIPTOR_HANDLE);
+	//ビューの作成
+	void CreateConstantView(Microsoft::WRL::ComPtr<ID3D12Resource>&, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>&);
+	void CreateShaderResourceView(Microsoft::WRL::ComPtr<ID3D12Resource>&, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>&, const DXGI_FORMAT);
+	void CreateDepthView(Microsoft::WRL::ComPtr<ID3D12Resource>&, const D3D12_CPU_DESCRIPTOR_HANDLE);
 }

@@ -12,14 +12,13 @@ namespace Beginner
 	class Sprite :public Base
 	{
 	private:
-		void CopyTexture(const HWND);//テクスチャをコピー
+		void CopyTexture();//テクスチャをコピー
 		void SetVertex(float, float);//頂点情報を設定
-		bool CreateSpriteBuffer(const HWND);//頂点と構成順番のバッファを作成
+		bool CreateSpriteBuffer();//頂点と構成順番のバッファを作成
 		void VertexIndexOrder(std::vector<unsigned short>&, const Size);//頂点正規化とトポロジ決め
 		void SetVertexView(const size_t, const UINT, const D3D12_GPU_VIRTUAL_ADDRESS);//頂点ビューの設定
 		void SetIndexView(const UINT, const D3D12_GPU_VIRTUAL_ADDRESS);//インデックスビューの設定
-
-		bool RegistSprite(const HWND);//SpriteのRegist動作をまとめる
+		bool SetUpSprite();//SpriteのSetUp動作
 
 		//Buffer
 		Microsoft::WRL::ComPtr<ID3D12Resource> textureBuffer;
@@ -52,8 +51,7 @@ namespace Beginner
 		Shader* pixelShader;
 		Shader* vertexShader;
 
-		bool RegistCall(const HWND)override;//Regist時に呼び出し
-		void DrawCall(const HWND)override;//描画時に呼び出し
+		void DrawCall()override;//描画時に呼び出し
 
 		static Sprite* CreateSprite(const char*);//Create Sprite
 	};

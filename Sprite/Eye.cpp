@@ -16,7 +16,7 @@ namespace Beginner
 	{}
 
 	//視点の行列の更新
-	void Eye::UpdateViewMatrix(const HWND hwnd)
+	void Eye::UpdateViewMatrix()
 	{
 		const Vector3 radAngle = {
 			rotation.x * DirectX::XM_PI / 180.0F,
@@ -24,7 +24,7 @@ namespace Beginner
 			rotation.z * DirectX::XM_PI / 180.0F
 		};
 
-		const Size size = GetWindowSize(hwnd);
+		const Size size = GetWindowSize();
 
 		const Vector3 clipPosition =
 		{

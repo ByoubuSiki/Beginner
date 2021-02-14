@@ -13,11 +13,11 @@ namespace Beginner
 	class Figure : public Base
 	{
 	private:
-		void VertexIndexOrder(std::vector<unsigned short>&, const Size);//Vertex Order
-		bool RegistFigure(const HWND);//Regist時の動作
+		void VertexIndexOrder(std::vector<unsigned short>&, const Size);//ポリゴン構成順を決定
+		bool SetUpFigure();//Figureクラスのセットアップ
 		void SetVertexView(const size_t, const UINT, const D3D12_GPU_VIRTUAL_ADDRESS);//頂点ビューの設定
 		void SetIndexView(const UINT, const D3D12_GPU_VIRTUAL_ADDRESS);//インデックスビューの設定
-		bool CreateFigureBuffer(const HWND);//頂点と構成順番のバッファを作成
+		bool CreateFigureBuffer();//頂点と構成順番のバッファを作成
 
 		D3D12_PRIMITIVE_TOPOLOGY drawTopology;//描画
 		GraphicsPipeline pipeline;//パイプライン
@@ -39,20 +39,15 @@ namespace Beginner
 			Shader::CreateShader("../Shader/Figure.hlsl", "main", PIXEL_SHADER_5_0)) {}
 		Figure(Shader* vertex, Shader* pixel)
 			:vertexUV(), pipeline(), cbvHeap(), vertexView(), indexView(), vertexBuffer(nullptr),
-			indexBuffer(nullptr), drawTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
-		{
-			vertexShader = vertex; pixelShader = pixel;
-		}
+			indexBuffer(nullptr), drawTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
+			vertexShader(vertex),pixelShader(pixel){}
 		~Figure() {}
 
-		bool RegistCall(const HWND)override;//Regist時に呼び出し
-		void DrawCall(const HWND)override;//描画時に呼び出し
-
+		void DrawCall()override;//描画時に呼び出し
 		static Figure* CreateFigure(const unsigned short, Vector3[]);//図形の作成
 
-		//Shader
-		Shader* pixelShader;
-		Shader* vertexShader;
+		Shader* pixelShader;//ピクセルシェーダ
+		Shader* vertexShader;//頂点シェーダ
 	};
 
 	extern std::list<Figure> figureList;//図形

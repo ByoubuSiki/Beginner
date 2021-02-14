@@ -20,7 +20,7 @@ namespace Beginner
 		float fov;//画角
 		float nearZ, farZ;//視界の奥行
 
-		void UpdateViewMatrix(const HWND);//ビュー行列の更新
+		void UpdateViewMatrix();//ビュー行列の更新
 		DirectX::XMMATRIX& GetViewMatrix() { return viewMatrix; }
 		DirectX::XMMATRIX& GetProjMatrix() { return projctionMatrix; }
 

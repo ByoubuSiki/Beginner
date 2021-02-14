@@ -62,7 +62,7 @@ namespace Beginner
 	}
 
 	//バッファの作成
-	bool CreateBuffer(const HWND hwnd, Microsoft::WRL::ComPtr<ID3D12Resource>& buffer, const size_t bufferSize)
+	bool CreateBuffer(Microsoft::WRL::ComPtr<ID3D12Resource>& buffer, const size_t bufferSize)
 	{
 		D3D12_HEAP_PROPERTIES heapprop = {};//ヒープ設定
 		{
@@ -102,7 +102,7 @@ namespace Beginner
 		return true;
 	}
 
-	bool CreateBuffer(const HWND hwnd, Microsoft::WRL::ComPtr<ID3D12Resource>& buffer, const DirectX::TexMetadata& metaData)
+	bool CreateBuffer(Microsoft::WRL::ComPtr<ID3D12Resource>& buffer, const DirectX::TexMetadata& metaData)
 	{
 		D3D12_HEAP_PROPERTIES textureHeap = {};
 		{
@@ -142,13 +142,13 @@ namespace Beginner
 		return true;
 	}
 
-	bool CreateDepthBuffer(const HWND hwnd, Microsoft::WRL::ComPtr<ID3D12Resource>& buffer)
+	bool CreateDepthBuffer(Microsoft::WRL::ComPtr<ID3D12Resource>& buffer)
 	{
 		D3D12_RESOURCE_DESC depthDesc = {};
 		{
 			depthDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-			depthDesc.Width = (UINT64)GetWindowSize(hwnd).x;
-			depthDesc.Height = (UINT)GetWindowSize(hwnd).y;
+			depthDesc.Width = (UINT64)GetWindowSize().x;
+			depthDesc.Height = (UINT)GetWindowSize().y;
 			depthDesc.DepthOrArraySize = 1;
 			depthDesc.Format = DXGI_FORMAT_D32_FLOAT;
 			depthDesc.SampleDesc.Count = 1;
@@ -359,11 +359,11 @@ namespace Beginner
 	}
 
 	//ウィンドウサイズを取得
-	Size GetWindowSize(const HWND hwnd)
+	Size GetWindowSize()
 	{
 		RECT rect = {};
 
-		if (FALSE == GetWindowRect(hwnd, &rect))
+		if (FALSE == GetWindowRect(beginHwnd, &rect))
 		{
 			return Size(0, 0);
 		}
@@ -428,7 +428,7 @@ namespace Beginner
 	}
 
 	//ビューの作製
-	void CreateConstantView(const HWND hwnd, Microsoft::WRL::ComPtr<ID3D12Resource>& constBuffer, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap)
+	void CreateConstantView(Microsoft::WRL::ComPtr<ID3D12Resource>& constBuffer, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap)
 	{
 		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
 		{
@@ -442,7 +442,7 @@ namespace Beginner
 	}
 
 	//SRVを作成
-	void CreateShaderResourceView(const HWND hwnd, Microsoft::WRL::ComPtr<ID3D12Resource>& texture, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap, const DXGI_FORMAT format)
+	void CreateShaderResourceView(Microsoft::WRL::ComPtr<ID3D12Resource>& texture, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap, const DXGI_FORMAT format)
 	{
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		{
@@ -459,7 +459,7 @@ namespace Beginner
 		device->CreateShaderResourceView(texture.Get(), &srvDesc, handle);
 	}
 
-	void CreateDepthView(const HWND hwnd, Microsoft::WRL::ComPtr<ID3D12Resource>& buffer, const D3D12_CPU_DESCRIPTOR_HANDLE handle)
+	void CreateDepthView(Microsoft::WRL::ComPtr<ID3D12Resource>& buffer, const D3D12_CPU_DESCRIPTOR_HANDLE handle)
 	{
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
 		{

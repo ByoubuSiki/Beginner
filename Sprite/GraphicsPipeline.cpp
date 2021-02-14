@@ -68,7 +68,7 @@ namespace Beginner
 	}
 
 	//ルートシグネチャの作成
-	bool GraphicsPipeline::CreateRootSignature(const HWND hwnd)
+	bool GraphicsPipeline::CreateRootSignature()
 	{
 		HRESULT result = device->CreateRootSignature(
 			0, rootBlob->GetBufferPointer(), rootBlob->GetBufferSize(),
@@ -86,13 +86,13 @@ namespace Beginner
 
 	//パイプラインの作成
 	bool GraphicsPipeline::CreateGraphicsPipeline(
-		const HWND hwnd, const D3D12_PRIMITIVE_TOPOLOGY topology, const OBJECT_TYPE objectType,
+		const D3D12_PRIMITIVE_TOPOLOGY topology, const OBJECT_TYPE objectType,
 		const Microsoft::WRL::ComPtr<ID3DBlob>& vsShader,
 		const Microsoft::WRL::ComPtr<ID3DBlob>& psShader
 	)
 	{
 		//ルートシグネチャの作成
-		if (!CreateBinaryCode(objectType) || !CreateRootSignature(hwnd))
+		if (!CreateBinaryCode(objectType) || !CreateRootSignature())
 		{
 			return false;
 		}

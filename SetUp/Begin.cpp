@@ -6,15 +6,14 @@ namespace Beginner
 	//DirectXの初期化
 	bool Begin::Init(const HWND hwnd)
 	{
-		winHandle = hwnd;
+		beginHwnd = hwnd;
 
 		//DirectXのエラーを可視化・初期化・設定
 		if (!init && EnableDebugLayer() && DeviceCommandInits() && BufferInits())
 		{
-
 			init = true;//フラグ建てる
 
-			CreateDepthView(winHandle, depthBuffer, dsvHeap.GetHeap()->GetCPUDescriptorHandleForHeapStart());
+			CreateDepthView(depthBuffer, dsvHeap.GetHeap()->GetCPUDescriptorHandleForHeapStart());
 
 			return true;
 		}
@@ -38,7 +37,6 @@ namespace Beginner
 		//画面クリア
 		float color[] = { 1.0F,1.0F,1.0F,1.0F };
 		commandList->ClearRenderTargetView(rtvHandle, color, 0, nullptr);
-
 		commandList->ClearDepthStencilView(dsvView, D3D12_CLEAR_FLAG_DEPTH, 1.0F, 0, 0, nullptr);
 	}
 
@@ -70,62 +68,6 @@ namespace Beginner
 		return true;
 	}
 
-	// 表示オブジェクトの登録
-	bool Begin::Regist(Base* base)
-	{
-		if (base == nullptr)
-		{
-			DebugLogOnConsole("Regist対象がnullptr\n");
-			return false;
-		}
-
-		//Regist済みである
-		if (base->GetRegist())
-		{
-			DebugLogOnConsole("Regist済み\n");
-			return false;
-		}
-
-		//登録時の動作を判定
-		if (!base->RegistCall(winHandle))
-		{
-			DebugLogOnConsole("Registの失敗\n");
-			return false;
-		}
-
-		//RegistCallの命令を処理待ち
-		if (!CommandAction())
-		{
-			DebugLogOnConsole("Regist時のCommandProcessが失敗\n");
-			return false;
-		}
-
-		registBase.push_back(base);//Registしたオブジェクトを記録
-
-		return true;
-	}
-
-	//視点オブジェクトの登録
-	bool Begin::Regist(Eye* eye)
-	{
-		if (eye == nullptr)
-		{
-			DebugLogOnConsole("Regist対象がnullptr\n");
-			return false;
-		}
-
-		//Regist済みである
-		if (eye->GetRegist())
-		{
-			DebugLogOnConsole("Regist済み\n");
-			return false;
-		}
-
-		mainEye = eye;
-
-		return true;
-	}
-
 	// RTVのアドレス取得
 	D3D12_CPU_DESCRIPTOR_HANDLE Begin::GetRTVAddress()
 	{
@@ -144,20 +86,20 @@ namespace Beginner
 	//登録済みのオブジェクトを描画
 	void Begin::Draw()
 	{
-		mainEye->UpdateViewMatrix(winHandle);//視点情報を更新
+		mainEye->UpdateViewMatrix();//視点情報を更新
 
 		//描画範囲を設定
-		DrawRange drawRange = { GetWindowSize(winHandle) };
+		DrawRange drawRange = { GetWindowSize() };
 
 		commandList->RSSetScissorRects(1, &drawRange.GetRect());
 		commandList->RSSetViewports(1, &drawRange.GetViewPort());
 
 		//オブジェクトの描画処理を行う
-		for (auto registItr = registBase.begin();
-			registItr != registBase.end();
+		for (auto registItr = outputObject.begin();
+			registItr != outputObject.end();
 			registItr++)
 		{
-			(*registItr)->DrawCall(winHandle);//描画対象ごとに処理を呼び出し
+			(*registItr)->DrawCall();//描画対象ごとに処理を呼び出し
 		}
 	}
 
@@ -203,7 +145,7 @@ namespace Beginner
 		if (graphics.CreateUntilAdapter() &&
 			command.CreateCommand(graphics.GetDevice()) &&
 			rtvHeap.CreateRTV(graphics.GetDevice(), 2) &&
-			graphics.CreateUntilEnd(command.GetCommandQueue(), rtBuffer, rtvHeap.GetHeap()->GetCPUDescriptorHandleForHeapStart(), winHandle))
+			graphics.CreateUntilEnd(command.GetCommandQueue(), rtBuffer, rtvHeap.GetHeap()->GetCPUDescriptorHandleForHeapStart()))
 		{
 			device = graphics.GetDevice();
 			commandList = command.GetGraphicsCommandList();
@@ -216,7 +158,7 @@ namespace Beginner
 	//BufferとViewの初期化
 	bool Begin::BufferInits()
 	{
-		if (dsvHeap.CreateDSV(graphics.GetDevice()) && CreateDepthBuffer(winHandle, depthBuffer) && prevention.CreateFence(graphics.GetDevice()))
+		if (dsvHeap.CreateDSV(graphics.GetDevice()) && CreateDepthBuffer(depthBuffer) && prevention.CreateFence(graphics.GetDevice()))
 		{
 			return true;
 		}

@@ -2,11 +2,10 @@
 
 namespace Beginner
 {
-
-	std::list<Sprite> spriteList;
+	std::list<Sprite> spriteList;//画像のメモリ
 
 	//テクスチャをコピー
-	void Sprite::CopyTexture(const HWND hwnd)
+	void Sprite::CopyTexture()
 	{
 		const DirectX::Image* image = scratch.GetImage(0, 0, 0);
 
@@ -61,15 +60,15 @@ namespace Beginner
 	}
 
 	//頂点をマップ
-	bool Sprite::CreateSpriteBuffer(const HWND hwnd)
+	bool Sprite::CreateSpriteBuffer()
 	{
 		std::vector<unsigned short> index;//頂点バッファの構成順番
 
-		VertexIndexOrder(index, GetWindowSize(hwnd));//頂点の構成順番
+		VertexIndexOrder(index, GetWindowSize());//頂点の構成順番
 
 		//頂点バッファとインデックスバッファを作成
-		if (!CreateBuffer(hwnd, vertexBuffer, sizeof(vertexUV[0]) * vertexUV.size()) ||
-			!CreateBuffer(hwnd, indexBuffer, sizeof(index[0]) * index.size()))
+		if (!CreateBuffer(vertexBuffer, sizeof(vertexUV[0]) * vertexUV.size()) ||
+			!CreateBuffer(indexBuffer, sizeof(index[0]) * index.size()))
 		{
 			return false;
 		}
@@ -126,18 +125,18 @@ namespace Beginner
 	}
 
 	//Regist時に呼び出し
-	bool Sprite::RegistSprite(HWND hwnd)
+	bool Sprite::SetUpSprite()
 	{
 		const DirectX::Image* image = scratch.GetImage(0, 0, 0);
 		const size_t imageSize = AlignmentedSize(image->rowPitch, D3D12_TEXTURE_DATA_PITCH_ALIGNMENT);
 
 		SetVertex((float)image->width, (float)image->height);//矩形の頂点座標を設定
 
-		if (CreateSpriteBuffer(hwnd) &&//三角形の構成順序
+		if (CreateSpriteBuffer() &&//三角形の構成順序
 			cbv_srvHeap.CreateCBV_SRV_UAV(device, 2) &&//CBVとSRVを隣同士で作成
-			pipeline.CreateGraphicsPipeline(hwnd, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, SPRITE_TYPE, vertexShader->GetShaderBlob(), pixelShader->GetShaderBlob()) &&//パイプライン作成
-			CreateBuffer(hwnd, textureBuffer, metaData) && //texture作製
-			CreateBuffer(hwnd, uploadBuffer, imageSize * image->height) &&//upload作成
+			pipeline.CreateGraphicsPipeline(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, SPRITE_TYPE, vertexShader->GetShaderBlob(), pixelShader->GetShaderBlob()) &&//パイプライン作成
+			CreateBuffer(textureBuffer, metaData) && //texture作製
+			CreateBuffer(uploadBuffer, imageSize * image->height) &&//upload作成
 			BufferMap(uploadBuffer, *image, true) != nullptr)//データを転送
 		{
 			return true;
@@ -146,28 +145,10 @@ namespace Beginner
 		return false;
 	}
 
-	//Regist時に呼び出し
-	bool Sprite::RegistCall(const HWND hwnd)
-	{
-		//FigureのRegistCallも行う
-		if (RegistObject(hwnd) && RegistSprite(hwnd))
-		{
-			auto heap = cbv_srvHeap.GetHeap();
-			CreateConstantView(hwnd, constBuffer, heap);//CBV作成
-			CreateShaderResourceView(hwnd, textureBuffer, heap, metaData.format);//SRV作成
-			CopyTexture(hwnd);//テクスチャの転送
-
-			regist = true;
-			return true;
-		}
-
-		return false;
-	}
-
 	//描画時に呼び出し
-	void Sprite::DrawCall(const HWND hwnd)
+	void Sprite::DrawCall()
 	{
-		ApplyTransform(hwnd);
+		ApplyTransform();
 
 		//パイプラインとルートシグネチャを設定
 		commandList->SetPipelineState(pipeline.GetPipelineState().Get());
@@ -200,8 +181,18 @@ namespace Beginner
 		if (FAILED(result))
 		{
 			DebugLogOnConsole("画像の読込が失敗\n");
+			spriteList.erase(spriteItr);
 			return nullptr;
 		}
+
+		if (!spriteItr->SetUpObject() || !spriteItr->SetUpSprite())
+		{
+			DebugLogOnConsole("SetUp動作が失敗\n");
+			spriteList.erase(spriteItr);
+			return nullptr;
+		}
+
+		outputObject.push_back(&(*spriteItr));
 
 		return &(*spriteItr);
 	}

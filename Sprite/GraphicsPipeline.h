@@ -17,7 +17,7 @@ namespace Beginner
 		Microsoft::WRL::ComPtr<ID3DBlob> rootBlob;//シグネチャのデータ
 
 		bool CreateBinaryCode(const OBJECT_TYPE);//バイナリコードの作成
-		bool CreateRootSignature(const HWND);//ルートシグネチャの作成
+		bool CreateRootSignature();//ルートシグネチャの作成
 
 		//頂点シェーダの設定
 		void SetVertexShader(D3D12_GRAPHICS_PIPELINE_STATE_DESC&, const Microsoft::WRL::ComPtr<ID3DBlob>&);
@@ -41,7 +41,7 @@ namespace Beginner
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> GetRootSignature();
 
 		bool CreateGraphicsPipeline(//パイプラインの作成
-			const HWND, const D3D12_PRIMITIVE_TOPOLOGY, const OBJECT_TYPE,
+			const D3D12_PRIMITIVE_TOPOLOGY, const OBJECT_TYPE,
 			const Microsoft::WRL::ComPtr<ID3DBlob>&,
 			const Microsoft::WRL::ComPtr<ID3DBlob>&
 		);

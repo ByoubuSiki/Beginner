@@ -20,13 +20,13 @@ namespace Beginner
 		return true;
 	}
 
-	//BaseをRegistしたときの動作
-	bool Base::RegistObject(const HWND hwnd)
+	//Baseのセットアップ
+	bool Base::SetUpObject()
 	{
 		const size_t constAlign = AlignmentedSize(sizeof(*mapTransform), D3D12_TEXTURE_DATA_PITCH_ALIGNMENT);
 
 		//定数バッファを作成
-		if (CreateBuffer(hwnd, constBuffer, constAlign) && ConstantMap())
+		if (CreateBuffer(constBuffer, constAlign) && ConstantMap())
 		{
 			return true;
 		}
@@ -35,7 +35,7 @@ namespace Beginner
 	}
 
 	//角度の適用
-	void Base::ApplyTransform(const HWND hwnd)
+	void Base::ApplyTransform()
 	{
 		//拡大行列
 		*mapTransform = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
@@ -47,8 +47,8 @@ namespace Beginner
 		);
 
 		*mapTransform *= DirectX::XMMatrixTranslation(//移動行列
-			2.0F * position.x / (float)GetWindowSize(hwnd).x - 1.0F,
-			2.0F * position.y / (float)GetWindowSize(hwnd).y - 1.0F,
+			2.0F * position.x / (float)GetWindowSize().x - 1.0F,
+			2.0F * position.y / (float)GetWindowSize().y - 1.0F,
 			position.z
 		);
 
@@ -57,11 +57,5 @@ namespace Beginner
 			*mapTransform *= mainEye->GetViewMatrix();
 			*mapTransform *= mainEye->GetProjMatrix();
 		}
-	}
-
-	//Regist変数のゲッター
-	bool Base::GetRegist() const
-	{
-		return regist;
 	}
 }

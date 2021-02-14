@@ -24,26 +24,22 @@ namespace Beginner
 
 		itr->LoadModelData(scene->mRootNode, scene);
 
+		if (!itr->SetUpObject() || !itr->SetUpModel())
+		{
+			DebugLogOnConsole("ModelクラスのSetUpが失敗\n");
+			modelList.erase(itr);
+			return nullptr;
+		}
+
+		outputObject.push_back(&(*itr));
+
 		return &(*itr);
 	}
 
-	//Regist時に呼び出し
-	bool Model::RegistCall(const HWND hwnd)
-	{
-		if (RegistObject(hwnd) && RegistModel(hwnd))
-		{
-			regist = true;
-			return true;
-		}
-
-		DebugLogOnConsole("ModelのRegistが失敗\n");
-		return false;
-	}
-
 	// 描画時に呼び出し
-	void Model::DrawCall(const HWND hwnd)
+	void Model::DrawCall()
 	{
-		ApplyTransform(hwnd);//座標変換
+		ApplyTransform();//座標変換
 
 		//パイプラインとルートシグネチャを設定
 		commandList->SetPipelineState(pipeline.GetPipelineState().Get());
@@ -140,16 +136,16 @@ namespace Beginner
 		*/
 	}
 
-	//Modelクラス固有のRegist動作
-	bool Model::RegistModel(const HWND hwnd)
+	//ModelクラスのSetUp動作
+	bool Model::SetUpModel()
 	{
 		//Model用のバッファ作製 && CBV用ディスクリプタヒープ作製 && グラフィックパイプラインを作製
-		if (CreateModelBuffer(hwnd) &&
+		if (CreateModelBuffer() &&
 			cbvHeap.CreateCBV_SRV_UAV(device, 1) &&
-			pipeline.CreateGraphicsPipeline(hwnd, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, MODEL_TYPE, vertexShader->GetShaderBlob(), pixelShader->GetShaderBlob()))
+			pipeline.CreateGraphicsPipeline(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, MODEL_TYPE, vertexShader->GetShaderBlob(), pixelShader->GetShaderBlob()))
 		{
 			auto heap = cbvHeap.GetHeap();
-			CreateConstantView(hwnd, constBuffer, heap);//CBV用のViewを作製
+			CreateConstantView(constBuffer, heap);//CBV用のViewを作製
 
 			return true;
 		}
@@ -158,11 +154,11 @@ namespace Beginner
 	}
 
 	//Modelクラス用のバッファを作製・マップ処理
-	bool Model::CreateModelBuffer(const HWND hwnd)
+	bool Model::CreateModelBuffer()
 	{
 		//頂点情報・頂点インデックス用のバッファを作製
-		if (!CreateBuffer(hwnd, vertexBuffer, sizeof(vertex[0]) * vertex.size()) ||
-			!CreateBuffer(hwnd, indexBuffer, sizeof(vertexIndex[0]) * vertexIndex.size()))
+		if (!CreateBuffer(vertexBuffer, sizeof(vertex[0]) * vertex.size()) ||
+			!CreateBuffer(indexBuffer, sizeof(vertexIndex[0]) * vertexIndex.size()))
 		{
 			return false;
 		}

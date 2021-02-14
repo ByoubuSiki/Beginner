@@ -3,20 +3,6 @@
 namespace Beginner
 {
 
-	DirectGraphics::DirectGraphics()
-		:device(nullptr),
-		dxgiFactory(nullptr),
-		useAdapter(nullptr),
-		swapChain(nullptr)
-	{
-
-	}
-
-	DirectGraphics::~DirectGraphics()
-	{
-
-	}
-
 	//DirectXデバイスの初期化
 	bool DirectGraphics::CreateDevice()
 	{
@@ -102,13 +88,12 @@ namespace Beginner
 	}
 
 	//スワップチェインの作成
-	bool DirectGraphics::CreateSwapChain(
-		const Microsoft::WRL::ComPtr<ID3D12CommandQueue>& cmdQueue, const HWND hwnd)
+	bool DirectGraphics::CreateSwapChain(const Microsoft::WRL::ComPtr<ID3D12CommandQueue>& cmdQueue)
 	{
 		DXGI_SWAP_CHAIN_DESC1 swapchainDesc = {};//スワップチェインの設定
 		{
-			swapchainDesc.Width = (UINT)GetWindowSize(hwnd).x;
-			swapchainDesc.Height = (UINT)GetWindowSize(hwnd).y;
+			swapchainDesc.Width = (UINT)GetWindowSize().x;
+			swapchainDesc.Height = (UINT)GetWindowSize().y;
 			swapchainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 			swapchainDesc.Stereo = false;
 			swapchainDesc.SampleDesc.Count = 1;
@@ -122,7 +107,7 @@ namespace Beginner
 		}
 
 		HRESULT result = dxgiFactory->CreateSwapChainForHwnd(//DXGIオブジェクトの作成
-			cmdQueue.Get(), hwnd, &swapchainDesc, nullptr, nullptr,
+			cmdQueue.Get(), beginHwnd, &swapchainDesc, nullptr, nullptr,
 			(IDXGISwapChain1**)swapChain.ReleaseAndGetAddressOf()
 		);
 
@@ -192,11 +177,11 @@ namespace Beginner
 	bool DirectGraphics::CreateUntilEnd(
 		const Microsoft::WRL::ComPtr<ID3D12CommandQueue>& cmdQueue,
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>>& backBuffer,
-		const D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle, const HWND hwnd
+		const D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle
 	)
 	{
 		//スワップチェインの作成とバッファとの関連付け
-		if (CreateSwapChain(cmdQueue, hwnd) && CreateBackBuffer(backBuffer, cpuHandle))
+		if (CreateSwapChain(cmdQueue) && CreateBackBuffer(backBuffer, cpuHandle))
 		{
 			return true;
 		}

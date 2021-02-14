@@ -19,8 +19,7 @@ namespace Beginner
 		~Model() {}
 
 		static Model* CreateModel(const char*);//Modelクラスの実態を作製
-		bool RegistCall(const HWND)override;//Regist時に呼び出し
-		void DrawCall(const HWND)override;//描画時に呼び出し
+		void DrawCall()override;//描画時に呼び出し
 
 		//Shader変数
 		Shader* pixelShader;
@@ -31,8 +30,8 @@ namespace Beginner
 		void LoadModelData(aiNode*, const aiScene*);//再帰でAssimpのNodeを読み取り
 		void LoadModelMesh(aiMesh*);//AssimpのMesh情報を読み取り
 		void LoadModelVertex(aiMesh*, const unsigned);//頂点の情報を読み取り
-		bool RegistModel(const HWND);//Modelクラス固有のRegist動作
-		bool CreateModelBuffer(const HWND);//Modelクラス用のバッファを作製・マップ処理
+		bool SetUpModel();//ModelクラスのSetUp動作
+		bool CreateModelBuffer();//Modelクラス用のバッファを作製・マップ処理
 		void SetVertexView(const size_t, const UINT, const D3D12_GPU_VIRTUAL_ADDRESS);//頂点ビューの設定
 		void SetIndexView(const size_t, const D3D12_GPU_VIRTUAL_ADDRESS);//インデックスビューの設定
 
