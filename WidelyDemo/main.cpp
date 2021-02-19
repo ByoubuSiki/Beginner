@@ -32,16 +32,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{200,500,0}
 	};
 
-	/*Figure* figure = Figure::CreateFigure(_countof(a), a);
-	figure->position = { 300,500,1.0F };*/
+	//Figure* figure = Figure::CreateFigure(_countof(a), a);
+	//figure->rotation = { 300,500,1.0F };
 	
 
-	/*Sprite* sprite = Sprite::CreateSprite("Test.png");
-	sprite->position = { 400.0F,400.0F,1.5F };*/
+	Sprite* sprite = Sprite::CreateSprite("Test.png");
+	sprite->rotation = { 400.0F,400.0F,1.0F };
 	
 	//3D
 	/*Model* model = Model::CreateModel("models/OBJ/spider.obj");
-	model->position = { 0,0,100.0F };
+	model->rotation = { 0,0,100.0F };
 	model->rotation = { 0,0,0 };*/
 	
 
@@ -50,8 +50,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	eye->farZ = 1000.0F;
 	eye->nearZ = 1.0F;
 	eye->eyeType = PERSPECTIVE;
-	//eye->position = { 400,400,0 }; //model用
-	eye->position = { 0,0,0 }; //figure用
+	//eye->rotation = { 400,400,0 }; //model用
+	eye->rotation = { 0,0,0 }; //figure用
 
 
 	MSG msg = {};
@@ -67,6 +67,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//フレーム始めの処理
 		direct.FlameStart();
 		
+		if (GetAsyncKeyState(VK_DOWN)) {
+			eye->rotation.y -= 5.0F;
+			std::cout << "y " << eye->rotation.y << std::endl;
+		}
+		if (GetAsyncKeyState(VK_UP)) {
+			eye->rotation.y += 5.0F;
+			std::cout << "y " << eye->rotation.y << std::endl;
+		}
+		if (GetAsyncKeyState(VK_RIGHT)) {
+			eye->rotation.x -= 5.0F;
+			std::cout << "x " << eye->rotation.x << std::endl;
+		}
+		if (GetAsyncKeyState(VK_LEFT)) {
+			eye->rotation.x += 5.0F;
+			std::cout << "x " << eye->rotation.x << std::endl;
+		}
 		
 
 		//フレームの終了処理

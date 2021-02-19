@@ -95,9 +95,7 @@ namespace Beginner
 		commandList->RSSetViewports(1, &drawRange.GetViewPort());
 
 		//オブジェクトの描画処理を行う
-		for (auto registItr = outputObject.begin();
-			registItr != outputObject.end();
-			registItr++)
+		for (auto registItr = outputObject.begin(); registItr != outputObject.end(); registItr++)
 		{
 			(*registItr)->DrawCall();//描画対象ごとに処理を呼び出し
 		}
