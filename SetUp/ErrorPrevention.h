@@ -5,37 +5,12 @@
 namespace Beginner
 {
 
-	//フェンスとバリアの機能を持つ
-	class Prevention
-	{
-	public:
-		Prevention();
-		~Prevention();
+	bool CreateFence();//フェンス初期化
+	void WaitGPUCommandEnd();//GPU処理が終わるまで待つ
 
-		bool CreateFence(const Microsoft::WRL::ComPtr<ID3D12Device>&);//フェンス初期化
-		void WaitGPUCommandEnd(const Microsoft::WRL::ComPtr<ID3D12CommandQueue>&);//GPU処理が終わるまで待つ
-
-		void RenderTargetBarrier(//レンダーターゲットバリア
-			const Microsoft::WRL::ComPtr<ID3D12Resource>&,
-			const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>&
-		);
-
-		void PresentBarrier(//フリップバリア
-			const Microsoft::WRL::ComPtr<ID3D12Resource>&,
-			const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>&
-		);
-
-		void RegionBarrier(//Region時のバリア
-			const Microsoft::WRL::ComPtr<ID3D12Resource>&,
-			const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>&
-		);
-
-		Microsoft::WRL::ComPtr<ID3D12Fence> GetFence();
-
-	private:
-		Microsoft::WRL::ComPtr<ID3D12Fence> fence;//フェンスオブジェクト
-		UINT64 fenceValue;
-	};
+	void RenderTargetBarrier(const Microsoft::WRL::ComPtr<ID3D12Resource>&);//レンダーターゲットバリア
+	void PresentBarrier(const Microsoft::WRL::ComPtr<ID3D12Resource>&);//フリップバリア
+	void RegionBarrier(const Microsoft::WRL::ComPtr<ID3D12Resource>&);//Region時のバリア
 
 	//デバッグ用のレイヤーを有効化
 	bool EnableDebugLayer();

@@ -20,7 +20,7 @@ namespace Beginner
 		DirectX::XMMATRIX* mapTransform;//座標変換用マップアドレス
 
 	public:
-		Base() :position(0, 0, 0), rotation(0, 0, 0), scale(1, 1, 1) {}
+		Base() :mapTransform(nullptr),position(0, 0, 0), rotation(0, 0, 0), scale(1, 1, 1) {}
 		~Base() {}
 
 		Vector3 position;//中心座標

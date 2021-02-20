@@ -141,7 +141,7 @@ namespace Beginner
 	{
 		//Model用のバッファ作製 && CBV用ディスクリプタヒープ作製 && グラフィックパイプラインを作製
 		if (CreateModelBuffer() &&
-			cbvHeap.CreateCBV_SRV_UAV(device, 1) &&
+			cbvHeap.CreateCBV_SRV_UAV(1) &&
 			pipeline.CreateGraphicsPipeline(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, MODEL_TYPE, vertexShader->GetShaderBlob(), pixelShader->GetShaderBlob()))
 		{
 			auto heap = cbvHeap.GetHeap();

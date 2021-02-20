@@ -26,8 +26,8 @@ namespace Beginner
 	void Begin::FlameStart()
 	{
 		//バリア描画状態に設定
-		const UINT bufferIndex = graphics.GetSwapChain()->GetCurrentBackBufferIndex();
-		prevention.RenderTargetBarrier(rtBuffer[bufferIndex], commandList);
+		const UINT bufferIndex = swapChain->GetCurrentBackBufferIndex();
+		RenderTargetBarrier(rtBuffer[bufferIndex]);
 
 		//RTのアドレスからRTVを設定
 		const auto rtvHandle = GetRTVAddress();
@@ -45,11 +45,9 @@ namespace Beginner
 	{
 		Draw();	//描画処理
 
-		Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain = graphics.GetSwapChain();
-
 		//処理状態を変化
 		const UINT bufferIndex = swapChain->GetCurrentBackBufferIndex();
-		prevention.PresentBarrier(rtBuffer[bufferIndex], commandList);
+		PresentBarrier(rtBuffer[bufferIndex]);
 
 		//命令の処理に失敗
 		if (!CommandAction())
@@ -72,11 +70,11 @@ namespace Beginner
 	D3D12_CPU_DESCRIPTOR_HANDLE Begin::GetRTVAddress()
 	{
 		//バックバッファの取得に使用
-		const UINT bufferIndex = graphics.GetSwapChain()->GetCurrentBackBufferIndex();
+		const UINT bufferIndex = swapChain->GetCurrentBackBufferIndex();
 
 		//RTVディスクリプタのアドレスを位置調整する
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHeap.GetHeap()->GetCPUDescriptorHandleForHeapStart();
-		const UINT rtvIncrementSize = graphics.GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		const UINT rtvIncrementSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 		rtvHandle.ptr += bufferIndex * rtvIncrementSize;
 
@@ -104,9 +102,6 @@ namespace Beginner
 	// ユーザー側からの命令を処理
 	bool Begin::CommandAction()
 	{
-		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> allocator = command.GetAllocator();
-		Microsoft::WRL::ComPtr<ID3D12CommandQueue> queue = command.GetCommandQueue();
-
 		//命令の受付を終了
 		if (FAILED(commandList->Close()))
 		{
@@ -116,8 +111,8 @@ namespace Beginner
 
 		//命令を実行 処理完了まで停止
 		ID3D12CommandList* commandLists[] = { commandList.Get() };
-		queue->ExecuteCommandLists(1, commandLists);
-		prevention.WaitGPUCommandEnd(queue);
+		cmdQueue->ExecuteCommandLists(1, commandLists);
+		WaitGPUCommandEnd();
 
 		//命令を空にする
 		if (FAILED(allocator->Reset()))
@@ -140,13 +135,12 @@ namespace Beginner
 	bool Begin::DeviceCommandInits()
 	{
 		//描画・命令オブジェクトを初期化
-		if (graphics.CreateUntilAdapter() &&
-			command.CreateCommand(graphics.GetDevice()) &&
-			rtvHeap.CreateRTV(graphics.GetDevice(), 2) &&
-			graphics.CreateUntilEnd(command.GetCommandQueue(), rtBuffer, rtvHeap.GetHeap()->GetCPUDescriptorHandleForHeapStart()))
+		if (CreateUntilAdapter() &&
+			CreateCommand() &&
+			rtvHeap.CreateRTV(2) &&
+			CreateUntilEnd(rtBuffer, rtvHeap.GetHeap()->GetCPUDescriptorHandleForHeapStart()))
 		{
-			device = graphics.GetDevice();
-			commandList = command.GetGraphicsCommandList();
+
 			return true;
 		}
 
@@ -156,7 +150,7 @@ namespace Beginner
 	//BufferとViewの初期化
 	bool Begin::BufferInits()
 	{
-		if (dsvHeap.CreateDSV(graphics.GetDevice()) && CreateDepthBuffer(depthBuffer) && prevention.CreateFence(graphics.GetDevice()))
+		if (dsvHeap.CreateDSV() && CreateDepthBuffer(depthBuffer) && CreateFence())
 		{
 			return true;
 		}

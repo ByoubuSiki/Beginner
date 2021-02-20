@@ -46,6 +46,62 @@ namespace Beginner
 		commandList->ResourceBarrier(1, &barrier);
 	}
 
+	//テクスチャのコピーが完了するまで停止
+	bool Sprite::WaitCopyTexture()
+	{
+		//命令の受付を終了
+		if (FAILED(commandList->Close()))
+		{
+			DebugLogOnConsole("命令のクローズ処理が失敗\n");
+			return false;
+		}
+
+		//命令を実行 処理完了まで停止
+		ID3D12CommandList* commandLists[] = { commandList.Get() };
+		cmdQueue->ExecuteCommandLists(1, commandLists);
+		WaitGPUCommandEnd();
+
+		//命令を空にする
+		if (FAILED(allocator->Reset()))
+		{
+			DebugLogOnConsole("命令アロケータのリセットが失敗\n");
+			return false;
+		}
+
+		//コマンドリストをリセット
+		if (FAILED(commandList->Reset(allocator.Get(), nullptr)))
+		{
+			DebugLogOnConsole("コマンドリストのリセットが失敗\n");
+			return false;
+		}
+
+		return true;
+	}
+	//GPUの命令処理が終わるまで停止
+	void Sprite::WaitGPUCommandEnd()
+	{
+		cmdQueue->Signal(fence.Get(), ++fenceValue);
+
+		//GPUの処理が終わるまで待つ
+		if (fence->GetCompletedValue() != fenceValue)
+		{
+			//イベントの作成
+			HANDLE eventHandle = CreateEvent(nullptr, false, false, nullptr);
+
+			fence->SetEventOnCompletion(fenceValue, eventHandle);
+
+			if (eventHandle == 0)
+			{
+				return;
+			}
+
+			//イベント発生まで停止
+			WaitForSingleObject(eventHandle, INFINITE);
+
+			CloseHandle(eventHandle);//イベント終了
+		}
+	}
+
 	//頂点座標を決定
 	void Sprite::SetVertex(float imageWidth, float imageHeight)
 	{
@@ -133,7 +189,7 @@ namespace Beginner
 		SetVertex((float)image->width, (float)image->height);//矩形の頂点座標を設定
 
 		if (CreateSpriteBuffer() &&//三角形の構成順序
-			cbv_srvHeap.CreateCBV_SRV_UAV(device, 2) &&//CBVとSRVを隣同士で作成
+			cbv_srvHeap.CreateCBV_SRV_UAV(2) &&//CBVとSRVを隣同士で作成
 			pipeline.CreateGraphicsPipeline(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, SPRITE_TYPE, vertexShader->GetShaderBlob(), pixelShader->GetShaderBlob()) &&//パイプライン作成
 			CreateBuffer(textureBuffer, metaData) && //texture作製
 			CreateBuffer(uploadBuffer, imageSize * image->height) &&//upload作成
@@ -171,7 +227,7 @@ namespace Beginner
 	{
 		spriteList.push_back(Sprite());
 		auto spriteItr = --spriteList.end();
-
+		spriteItr->position = { 400,400,1.0 };
 		const std::wstring wstr = TransformToWideChar(fileName);
 
 		HRESULT result = DirectX::LoadFromWICFile(//画像の読込
@@ -188,6 +244,18 @@ namespace Beginner
 		if (!spriteItr->SetUpObject() || !spriteItr->SetUpSprite())
 		{
 			DebugLogOnConsole("SetUp動作が失敗\n");
+			spriteList.erase(spriteItr);
+			return nullptr;
+		}
+
+		auto heap = spriteItr->cbv_srvHeap.GetHeap();
+		CreateConstantView(spriteItr->constBuffer, heap);//CBV作成
+		CreateShaderResourceView(spriteItr->textureBuffer, heap, spriteItr->metaData.format);//SRV作成
+		spriteItr->CopyTexture();//テクスチャの転送
+
+		//CommandActionを入れる
+		if (!spriteItr->WaitCopyTexture())
+		{
 			spriteList.erase(spriteItr);
 			return nullptr;
 		}

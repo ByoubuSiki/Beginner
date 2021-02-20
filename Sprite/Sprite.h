@@ -13,6 +13,8 @@ namespace Beginner
 	{
 	private:
 		void CopyTexture();//テクスチャをコピー
+		bool WaitCopyTexture();//テクスチャのコピーが完了するまで停止
+		void WaitGPUCommandEnd();//GPUの命令処理が終わるまで停止
 		void SetVertex(float, float);//頂点情報を設定
 		bool CreateSpriteBuffer();//頂点と構成順番のバッファを作成
 		void VertexIndexOrder(std::vector<unsigned short>&, const Size);//頂点正規化とトポロジ決め

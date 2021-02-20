@@ -4,7 +4,7 @@ namespace Beginner
 {
 
 	//DirectXデバイスの初期化
-	bool DirectGraphics::CreateDevice()
+	bool CreateDevice()
 	{
 		//使えるバージョンを繰り返し調べる
 		std::vector<D3D_FEATURE_LEVEL> featureList =
@@ -39,7 +39,7 @@ namespace Beginner
 	}
 
 	//DXGIの初期化
-	bool DirectGraphics::CreateDXGIFactory()
+	bool CreateDXGIFactory()
 	{
 #ifdef _DEBUG
 		HRESULT result = CreateDXGIFactory2(//Errorを表示する
@@ -61,7 +61,7 @@ namespace Beginner
 	}
 
 	//使用するアダプタの取得
-	bool DirectGraphics::GetUseAdapter()
+	bool GetUseAdapter()
 	{
 		HRESULT result = dxgiFactory->EnumAdapters(0, useAdapter.ReleaseAndGetAddressOf());
 
@@ -76,7 +76,7 @@ namespace Beginner
 	}
 
 	//1段階目の初期化
-	bool DirectGraphics::CreateUntilAdapter()
+	bool CreateUntilAdapter()
 	{
 		//アダプタの作成までが成功
 		if (CreateDevice() && CreateDXGIFactory() && GetUseAdapter())
@@ -88,7 +88,7 @@ namespace Beginner
 	}
 
 	//スワップチェインの作成
-	bool DirectGraphics::CreateSwapChain(const Microsoft::WRL::ComPtr<ID3D12CommandQueue>& cmdQueue)
+	bool CreateSwapChain()
 	{
 		DXGI_SWAP_CHAIN_DESC1 swapchainDesc = {};//スワップチェインの設定
 		{
@@ -122,7 +122,7 @@ namespace Beginner
 	}
 
 	//バックバッファ数を返す
-	UINT DirectGraphics::GetBackBufferSize()
+	UINT GetBackBufferSize()
 	{
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 
@@ -138,7 +138,7 @@ namespace Beginner
 	}
 
 	//RTVのバッファ数だけ関連付け
-	bool DirectGraphics::CreateBackBuffer(
+	bool CreateBackBuffer(
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>>& backBuffer,
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle)
 	{
@@ -174,38 +174,17 @@ namespace Beginner
 	}
 
 	//残った初期化を行う
-	bool DirectGraphics::CreateUntilEnd(
-		const Microsoft::WRL::ComPtr<ID3D12CommandQueue>& cmdQueue,
+	bool CreateUntilEnd(
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>>& backBuffer,
 		const D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle
 	)
 	{
 		//スワップチェインの作成とバッファとの関連付け
-		if (CreateSwapChain(cmdQueue) && CreateBackBuffer(backBuffer, cpuHandle))
+		if (CreateSwapChain() && CreateBackBuffer(backBuffer, cpuHandle))
 		{
 			return true;
 		}
 
 		return false;
-	}
-
-	Microsoft::WRL::ComPtr<ID3D12Device> DirectGraphics::GetDevice()
-	{
-		return device;
-	}
-
-	Microsoft::WRL::ComPtr<IDXGIFactory6> DirectGraphics::GetDxgiFactory()
-	{
-		return dxgiFactory;
-	}
-
-	Microsoft::WRL::ComPtr<IDXGIAdapter> DirectGraphics::GetAdapter()
-	{
-		return useAdapter;
-	}
-
-	Microsoft::WRL::ComPtr<IDXGISwapChain4> DirectGraphics::GetSwapChain()
-	{
-		return swapChain;
 	}
 }

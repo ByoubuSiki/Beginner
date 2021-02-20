@@ -29,7 +29,7 @@ namespace Beginner
 	bool Figure::SetUpFigure()
 	{
 		if (CreateFigureBuffer() &&
-			cbvHeap.CreateCBV_SRV_UAV(device, 1) &&//CBV�̂ݍ쐬
+			cbvHeap.CreateCBV_SRV_UAV(1) &&//CBV�̂ݍ쐬
 			pipeline.CreateGraphicsPipeline(drawTopology, FIGURE_TYPE, vertexShader->GetShaderBlob(), pixelShader->GetShaderBlob()))
 		{
 			auto a = cbvHeap.GetHeap();

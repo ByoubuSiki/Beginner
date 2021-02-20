@@ -14,22 +14,17 @@ namespace Beginner
 	class Begin
 	{
 	public:
-		Begin() :rtBuffer(), depthBuffer(), prevention(), command(), graphics(), rtvHeap(), init(false) {}
-		~Begin(){DebugLogOnConsole("Widelyクラスが破棄\n");}
+		Begin() :rtBuffer(), depthBuffer(), rtvHeap(), init(false) {}
+		~Begin() { DebugLogOnConsole("Beginクラスが破棄\n"); }
 
 		bool Init(const HWND);//DirectXを初期化
 		void FlameStart();//フレーム開始処理
 		bool FlameEnd();//フレーム終了処理
 
-
 	private:
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> rtBuffer;//RenderTargetのBuffer
 		Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer;
 		DescriptorHeap rtvHeap, dsvHeap;
-
-		DirectCommand command;//DirectXの命令オブジェクト
-		DirectGraphics graphics;//DirectXの描画オブジェクト
-		Prevention prevention;//エラー防止オブジェクト
 
 		bool init : 1;//初期化済みフラグ
 

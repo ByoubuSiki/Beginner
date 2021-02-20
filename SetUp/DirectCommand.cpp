@@ -3,24 +3,11 @@
 namespace Beginner
 {
 
-	DirectCommand::DirectCommand()
-		:allocator(nullptr),
-		commandList(nullptr),
-		cmdQueue(nullptr)
-	{
-
-	}
-
-	DirectCommand::~DirectCommand()
-	{
-
-	}
-
 	//命令オブジェクトの初期化
-	bool DirectCommand::CreateCommand(const Microsoft::WRL::ComPtr<ID3D12Device>& device)
+	bool CreateCommand()
 	{
 		//命令系統の初期化
-		if (CreateAllocator(device) && CreateGraphicsList(device) && CreateQueue(device))
+		if (CreateAllocator() && CreateGraphicsList() && CreateQueue())
 		{
 			return true;
 		}
@@ -29,7 +16,7 @@ namespace Beginner
 	}
 
 	//コマンドアロケータの初期化
-	bool DirectCommand::CreateAllocator(const Microsoft::WRL::ComPtr<ID3D12Device>& device)
+	bool CreateAllocator()
 	{
 		HRESULT result = device->CreateCommandAllocator(//アロケータを作成
 			D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(allocator.ReleaseAndGetAddressOf())
@@ -46,7 +33,7 @@ namespace Beginner
 	}
 
 	//コマンドリストの作成
-	bool DirectCommand::CreateGraphicsList(const Microsoft::WRL::ComPtr<ID3D12Device>& device)
+	bool CreateGraphicsList()
 	{
 		HRESULT result = device->CreateCommandList(//コマンドリストを作成
 			0, D3D12_COMMAND_LIST_TYPE_DIRECT,
@@ -64,7 +51,7 @@ namespace Beginner
 	}
 
 	//コマンドキューの初期化
-	bool DirectCommand::CreateQueue(const Microsoft::WRL::ComPtr<ID3D12Device>& device)
+	bool CreateQueue()
 	{
 		//コマンドキュー設定
 		D3D12_COMMAND_QUEUE_DESC cmdQueueDesc = {};
@@ -90,18 +77,4 @@ namespace Beginner
 		return true;
 	}
 
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> DirectCommand::GetAllocator()
-	{
-		return allocator;
-	}
-
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> DirectCommand::GetGraphicsCommandList()
-	{
-		return commandList;
-	}
-
-	Microsoft::WRL::ComPtr<ID3D12CommandQueue> DirectCommand::GetCommandQueue()
-	{
-		return cmdQueue;
-	}
 }

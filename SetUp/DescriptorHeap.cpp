@@ -9,7 +9,7 @@ namespace Beginner
 	}
 
 	//SRVÇ∆CBVÇó◊ÇËçáÇÌÇπÇ≈çÏê¨
-	bool DescriptorHeap::CreateCBV_SRV_UAV(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const USHORT num)
+	bool DescriptorHeap::CreateCBV_SRV_UAV(const USHORT num)
 	{
 		D3D12_DESCRIPTOR_HEAP_DESC descHeap = {};
 		{
@@ -33,7 +33,7 @@ namespace Beginner
 	}
 
 	//RTVÇÃçÏê¨
-	bool DescriptorHeap::CreateRTV(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const USHORT num)
+	bool DescriptorHeap::CreateRTV(const USHORT num)
 	{
 		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};//ÉqÅ[ÉvÇÃê›íË
 		{
@@ -56,7 +56,7 @@ namespace Beginner
 		return true;
 	}
 
-	bool DescriptorHeap::CreateDSV(const Microsoft::WRL::ComPtr<ID3D12Device>& device)
+	bool DescriptorHeap::CreateDSV()
 	{
 		D3D12_DESCRIPTOR_HEAP_DESC depthDesc = {};
 		{

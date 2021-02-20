@@ -2,21 +2,8 @@
 
 namespace Beginner
 {
-
-	Prevention::Prevention()
-		:fence(nullptr),
-		fenceValue(0)
-	{
-
-	}
-
-	Prevention::~Prevention()
-	{
-
-	}
-
 	//フェンス作成
-	bool Prevention::CreateFence(const Microsoft::WRL::ComPtr<ID3D12Device>& device)
+	bool CreateFence()
 	{
 		HRESULT result = device->CreateFence(//フェンスの作成
 			fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.ReleaseAndGetAddressOf())
@@ -32,9 +19,9 @@ namespace Beginner
 	}
 
 	//GPU処理が終わるまで待つ
-	void Prevention::WaitGPUCommandEnd(const Microsoft::WRL::ComPtr<ID3D12CommandQueue>& queue)
+	void WaitGPUCommandEnd()
 	{
-		queue->Signal(fence.Get(), ++fenceValue);
+		cmdQueue->Signal(fence.Get(), ++fenceValue);
 
 		//GPUの処理が終わるまで待つ
 		if (fence->GetCompletedValue() != fenceValue)
@@ -58,10 +45,7 @@ namespace Beginner
 
 
 	//レンダーターゲット用リソースバリア
-	void Prevention::RenderTargetBarrier(
-		const Microsoft::WRL::ComPtr<ID3D12Resource>& resource,
-		const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& cmdGraphicsList
-	)
+	void RenderTargetBarrier(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource)
 	{
 		D3D12_RESOURCE_BARRIER barrier = {};//リソースバリアの設定
 
@@ -75,14 +59,11 @@ namespace Beginner
 			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		}
 
-		cmdGraphicsList->ResourceBarrier(1, &barrier);//バリアを実行
+		commandList->ResourceBarrier(1, &barrier);//バリアを実行
 	}
 
 	//フリップリソースバリア
-	void Prevention::PresentBarrier(
-		const Microsoft::WRL::ComPtr<ID3D12Resource>& resource,
-		const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& cmdGraphicsList
-	)
+	void PresentBarrier(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource)
 	{
 		//リソースバリアの設定
 		D3D12_RESOURCE_BARRIER barrier = {};
@@ -97,14 +78,11 @@ namespace Beginner
 			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 		}
 
-		cmdGraphicsList->ResourceBarrier(1, &barrier);//バリアを適用
+		commandList->ResourceBarrier(1, &barrier);//バリアを適用
 	}
 
 	//Region時のバリア
-	void Prevention::RegionBarrier(
-		const Microsoft::WRL::ComPtr<ID3D12Resource>& resource,
-		const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& cmdList
-	)
+	void RegionBarrier(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource)
 	{
 		D3D12_RESOURCE_BARRIER barrier = {};
 		{
@@ -117,12 +95,7 @@ namespace Beginner
 			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 		}
 
-		cmdList->ResourceBarrier(1, &barrier);
-	}
-
-	Microsoft::WRL::ComPtr<ID3D12Fence> Prevention::GetFence()
-	{
-		return fence;
+		commandList->ResourceBarrier(1, &barrier);
 	}
 
 	//デバッグ用のレイヤーを有効化
