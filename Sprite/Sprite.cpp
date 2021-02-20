@@ -227,7 +227,7 @@ namespace Beginner
 	{
 		spriteList.push_back(Sprite());
 		auto spriteItr = --spriteList.end();
-		spriteItr->position = { 400,400,1.0 };
+
 		const std::wstring wstr = TransformToWideChar(fileName);
 
 		HRESULT result = DirectX::LoadFromWICFile(//‰æ‘œ‚Ì“Ç
